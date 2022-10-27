@@ -5,7 +5,7 @@ import os
 from PIL import Image
 import cv2
 import saverloader
-import imageio.v2 as imageio
+import imageio as imageio
 from nets.pips import Pips
 import utils.improc
 import random
