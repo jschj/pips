@@ -19,7 +19,7 @@ random.seed(125)
 np.random.seed(125)
 
 def run_model(model, rgbs, N, sw):
-    rgbs = rgbs.cuda().float() # B, S, C, H, W
+    rgbs = rgbs.float() # B, S, C, H, W
 
     B, S, C, H, W = rgbs.shape
     rgbs_ = rgbs.reshape(B*S, C, H, W)
@@ -31,17 +31,17 @@ def run_model(model, rgbs, N, sw):
     # try to pick a point on the dog, so we get an interesting trajectory
     # x = torch.randint(-10, 10, size=(1, N), device=torch.device('cuda')) + 468
     # y = torch.randint(-10, 10, size=(1, N), device=torch.device('cuda')) + 118
-    x = torch.ones((1, N), device=torch.device('cuda')) * 450.0
-    y = torch.ones((1, N), device=torch.device('cuda')) * 100.0
+    x = torch.ones((1, N), device=torch.device('cpu')) * 450.0
+    y = torch.ones((1, N), device=torch.device('cpu')) * 100.0
     xy0 = torch.stack([x, y], dim=-1) # B, N, 2
     _, S, C, H, W = rgbs.shape
 
-    trajs_e = torch.zeros((B, S, N, 2), dtype=torch.float32, device='cuda')
+    trajs_e = torch.zeros((B, S, N, 2), dtype=torch.float32, device='cpu')
     for n in range(N):
         # print('working on keypoint %d/%d' % (n+1, N))
         cur_frame = 0
         done = False
-        traj_e = torch.zeros((B, S, 2), dtype=torch.float32, device='cuda')
+        traj_e = torch.zeros((B, S, 2), dtype=torch.float32, device='cpu')
         traj_e[:,0] = xy0[:,n] # B, 1, 2  # set first position 
         feat_init = None
         while not done:
@@ -143,7 +143,7 @@ def main():
 
     global_step = 0
 
-    model = Pips(stride=4).cuda()
+    model = Pips(stride=4)
     parameters = list(model.parameters())
     if init_dir:
         _ = saverloader.load(init_dir, model)
